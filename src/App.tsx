@@ -7,6 +7,7 @@ import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
 import Editor from "./pages/Editor";
 import DocumentList from "./pages/DocumentList";
+import ContactList from "./pages/ContactList";
 
 function App() {
   const location = useLocation();
@@ -26,6 +27,7 @@ function App() {
             <Route path="/login" element={<LogIn />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/e-signature" element={<Editor />} />
+            <Route path="/contact" element={<ContactList />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

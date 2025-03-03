@@ -15,35 +15,43 @@ export interface IAsset {
   status: string;
 }
 export enum SignatureStatus {
-  DRAFT = 'draft',
-  PENDING = 'pending',
-  SIGNED = 'signed',
+  DRAFT = "draft",
+  PENDING = "pending",
+  SIGNED = "signed",
 }
 
-
 export enum UserDocumentType {
-  OWNER = 'owner',
-  SIGNER = 'signer',
+  OWNER = "owner",
+  SIGNER = "signer",
 }
 
 export interface IDocuments {
-  id: string
-  title: string
-  base_url: string
-  root: string
-  folder: string
-  name: string
-  status: string
+  id: string;
+  title: string;
+  base_url: string;
+  root: string;
+  folder: string;
+  name: string;
+  status: string;
   user_documents: {
-    id: string
-    status: string
-    role: string
-    type: UserDocumentType
-    sequence: number
+    id: string;
+    status: string;
+    role: string;
+    type: UserDocumentType;
+    sequence: number;
     user: {
-      id: string
-      name: string
-      email: string
-    }
-  }[]
+      id: string;
+      name: string;
+      email: string;
+    };
+  }[];
+}
+
+export interface IContacts {
+  id: string;
+  recipient: {
+    id: string;
+    email: string;
+  };
+  recipient_name: string;
 }
