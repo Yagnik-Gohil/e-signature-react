@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { LayoutDashboard, FileText, Menu, X } from "lucide-react";
+import { FileText, Menu, X, PenTool, BookUser, CircleUser } from "lucide-react";
 import { Button } from "./button";
 import { logout } from "@/api/auth.service";
 
 const navItems = [
-  { name: "Home", path: "/", icon: LayoutDashboard },
-  { name: "Documents", path: "/documents", icon: FileText },
+  { name: "Documents", path: "/", icon: FileText },
+  { name: "Request E-Signature", path: "/e-signature", icon: PenTool },
+  { name: "Contacts list", path: "/contact", icon: BookUser },
+  { name: "My Profile", path: "/profile", icon: CircleUser },
 ];
 
 const Sidebar = () => {

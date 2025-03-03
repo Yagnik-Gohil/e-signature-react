@@ -33,7 +33,7 @@ const Pagination = ({
   const end = Math.min(offset + limit, total);
 
   return (
-    <div className="flex justify-between items-center mt-4 p-4 gap-4 font-medium border border-gray-300 rounded-lg shadow-md bg-white absolute">
+    <div className="flex justify-between items-center mt-4 p-4 gap-4 font-medium border border-gray-300 rounded-lg shadow-md bg-white absolute bottom-4 right-4">
       <div className="flex items-center space-x-2">
         <Select
           onValueChange={(value) => {
