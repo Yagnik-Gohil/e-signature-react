@@ -22,3 +22,13 @@ export const getDocuments = async (
     })
   );
 };
+
+export const getDocumentById = async (
+  id: string
+): Promise<{
+  status: number;
+  message: string;
+  data: IDocuments;
+}> => {
+  return apiHelper(axiosInstance.get(`/user-document/document/${id}`));
+};

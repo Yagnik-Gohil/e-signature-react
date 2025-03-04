@@ -17,13 +17,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { IDocuments, SignatureStatus, UserDocumentType } from "@/types";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Edit } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const DocumentList = () => {
   const [list, setList] = useState<IDocuments[]>([]);
   const [limit, setLimit] = useState(10);
   const [offset, setOffset] = useState(0);
   const [total, setTotal] = useState(0);
+  const navigate = useNavigate();
+  const currentUser = localStorage.getItem("user_id");
 
   const fetchList = async () => {
     const result = await getDocuments(limit, offset);
@@ -69,6 +73,9 @@ const DocumentList = () => {
             </TableHead>
             <TableHead className="text-left text-gray-700 uppercase px-4 py-3">
               Signers
+            </TableHead>
+            <TableHead className="text-left text-gray-700 uppercase px-4 py-3">
+              Action
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -157,7 +164,7 @@ const DocumentList = () => {
                             <span
                               className={`px-3 py-1 text-xs font-semibold rounded-full capitalize
                                 ${
-                                data.status === SignatureStatus.SIGNED
+                                  data.status === SignatureStatus.SIGNED
                                     ? "bg-green-100 text-green-700"
                                     : data.status === SignatureStatus.PENDING
                                     ? "bg-yellow-100 text-yellow-700"
@@ -172,11 +179,26 @@ const DocumentList = () => {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
+
+                <TableCell className="px-4 py-3 capitalize font-medium">
+                  <Button
+                    disabled={
+                      currentUser !=
+                      item.user_documents.find(
+                        (user) => user.type === UserDocumentType.OWNER
+                      )?.user.id
+                    }
+                    onClick={() => navigate(`editor/${item.id}`)}
+                    variant="outline"
+                  >
+                    <Edit></Edit> Edit
+                  </Button>
+                </TableCell>
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-4">
+              <TableCell colSpan={6} className="text-center py-4">
                 <DataNotFound />
               </TableCell>
             </TableRow>

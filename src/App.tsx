@@ -5,9 +5,10 @@ import NotFound from "./pages/NotFound";
 import LogIn from "./pages/LogIn";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
-import Editor from "./pages/Editor";
+import FileUpload from "./pages/FileUpload";
 import DocumentList from "./pages/DocumentList";
 import ContactList from "./pages/ContactList";
+import Editor from "./pages/Editor";
 
 function App() {
   const location = useLocation();
@@ -26,7 +27,8 @@ function App() {
             <Route path="/" element={<DocumentList />} />
             <Route path="/login" element={<LogIn />} />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/e-signature" element={<Editor />} />
+            <Route path="/upload" element={<FileUpload />} />
+            <Route path="/editor/:id" element={<Editor />} />
             <Route path="/contact" element={<ContactList />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="*" element={<NotFound />} />

@@ -68,8 +68,8 @@ const Profile = () => {
     <div className="flex h-full justify-center items-center bg-gray-50">
       <div className="w-full max-w-md bg-white shadow-md rounded-lg p-8">
         <h1 className="text-2xl font-bold text-gray-800 mb-1">Edit Profile</h1>
-        <div className="mb-4 flex items-center justify-between bg-gray-100 rounded-md p-2">
-          <div className="text-sm mr-2 text-right font-bold text-gray-500">
+        <div className="mb-4 flex items-center bg-gray-100 rounded-md p-2">
+          <div className="text-sm mr-2 text-left font-bold text-gray-500">
             <p>{profile.email}</p>
             <p>Registered On {profile.created_at}</p>
           </div>

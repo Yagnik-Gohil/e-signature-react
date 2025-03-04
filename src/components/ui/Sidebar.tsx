@@ -6,7 +6,7 @@ import { logout } from "@/api/auth.service";
 
 const navItems = [
   { name: "Documents", path: "/", icon: FileText },
-  { name: "Request E-Signature", path: "/e-signature", icon: PenTool },
+  { name: "Request E-Signature", path: "/upload", icon: PenTool },
   { name: "Contacts list", path: "/contact", icon: BookUser },
   { name: "My Profile", path: "/profile", icon: CircleUser },
 ];

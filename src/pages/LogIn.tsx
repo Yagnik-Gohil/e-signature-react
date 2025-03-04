@@ -43,6 +43,7 @@ const LogIn = () => {
 
     if (response.status) {
       const data = response.data;
+      localStorage.setItem("user_id", data.user.id);
       localStorage.setItem("token", data.jwt);
       navigate("/");
     }
