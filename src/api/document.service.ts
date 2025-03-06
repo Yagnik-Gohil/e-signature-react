@@ -1,4 +1,4 @@
-import { IDocuments } from "@/types";
+import { IDocuments, IAddSignatureBox } from "@/types";
 import apiHelper from "./apiHelper";
 import axiosInstance from "./axiosInstance";
 
@@ -30,5 +30,11 @@ export const getDocumentById = async (
   message: string;
   data: IDocuments;
 }> => {
-  return apiHelper(axiosInstance.get(`/user-document/document/${id}`));
+  return apiHelper(axiosInstance.get(`/document/${id}`));
+};
+
+export const saveSignatureBoxes = async (
+  data: IAddSignatureBox
+): Promise<{ status: number; message: string; data: IDocuments }> => {
+  return apiHelper(axiosInstance.post("user-document/signature-boxes", data));
 };

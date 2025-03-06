@@ -33,11 +33,12 @@ export interface IDocuments {
   folder: string;
   name: string;
   status: string;
-  user_documents: {
+  user_document: {
     id: string;
     status: string;
     role: string;
     type: UserDocumentType;
+    signature_box: ISignatureBox;
     sequence: number;
     user: {
       id: string;
@@ -55,3 +56,17 @@ export interface IContacts {
   };
   recipient_name: string;
 }
+export interface ISignatureBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+export interface IAddSignatureBox {
+  user_document: {
+    id: string
+    signature_box: ISignatureBox
+  }[]
+}
+
+
