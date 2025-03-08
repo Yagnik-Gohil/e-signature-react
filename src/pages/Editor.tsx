@@ -15,6 +15,7 @@ const Editor = () => {
   const [contacts, setContacts] = useState<IContacts[]>([]);
   const [selectedUser, setSelectedUser] = useState<string>("");
   const [isSignatureAdded, setIsSignatureAdded] = useState<boolean>(false);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
   const currentUser = localStorage.getItem("user_id");
 
   const signatureRef = useRef<SignatureCanvas | null>(null);
@@ -89,6 +90,8 @@ const Editor = () => {
     const blob = await (await fetch(dataUrl)).blob();
     const file = new File([blob], "signature.png", { type: "image/png" });
 
+    setIsUploading(true);
+
     try {
       const response = await uploadSignature(file, id!, selectedUser);
       if (response.status === 1) {
@@ -99,6 +102,8 @@ const Editor = () => {
       }
     } catch (error) {
       console.error("Failed to upload signature:", error);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -215,6 +220,7 @@ const Editor = () => {
           <div className="mt-auto w-full">
             <button
               disabled={
+                isUploading ||
                 !isSignatureAdded ||
                 (document &&
                   document?.user_document.length < 3 &&
@@ -222,6 +228,7 @@ const Editor = () => {
               }
               onClick={signDocument}
               className={`w-full px-4 py-2 rounded ${
+                isUploading ||
                 !isSignatureAdded ||
                 (document &&
                   document?.user_document.length < 3 &&
@@ -230,7 +237,14 @@ const Editor = () => {
                   : "bg-blue-500 text-white"
               }`}
             >
-              Sign
+              {isUploading ? (
+                <div className="flex items-center justify-center">
+                  <Loader2 className="animate-spin w-5 h-5 mr-2" />
+                  Uploading...
+                </div>
+              ) : (
+                "Sign"
+              )}
             </button>
           </div>
         </div>
