@@ -1,54 +1,47 @@
-# React + TypeScript + Vite
+# E-Signature React Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is an E-Signature application built with React, TypeScript, and Vite. It allows users to sign documents electronically and manage signers.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Electronically sign documents
+- Manage signers for documents
+- Upload signatures to S3
+- Merge signatures with PDF documents
 
-## Expanding the ESLint configuration
+## Demo
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+You can watch a demo of the application [here](https://d21r3yo3pas5u.cloudfront.net/e-signature/e-signature-workflow-demo.mkv).
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+You can download PDF Template [here](https://d21r3yo3pas5u.cloudfront.net/e-signature/E-SIGNATURE-TEMPLATE.pdf).
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Getting Started
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Backend Setup
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+First, set up the backend for this application. Follow the instructions in the [e-signature-nest](https://github.com/Yagnik-Gohil/e-signature-nest) repository.
+
+### Frontend Setup
+
+1. Clone the repository:
+
+   ```sh
+   git clone https://github.com/your-username/e-signature-react.git
+   cd e-signature-react
+   ```
+
+2. Install dependencies:
+
+   ```sh
+   npm install
+   ```
+
+### Running the Application
+
+1. Start the development server:
+
+   ```sh
+   npm run dev
+   ```
+
+2. Open your browser and navigate to `http://localhost:5173`.
