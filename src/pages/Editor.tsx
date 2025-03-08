@@ -5,6 +5,7 @@ import SignatureCanvas from "react-signature-canvas";
 import { Loader2 } from "lucide-react";
 import { IDocuments, IContacts } from "@/types";
 import { getContacts } from "@/api/contact.service";
+import { uploadSignature } from "@/api/upload.service";
 
 const Editor = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,6 +14,7 @@ const Editor = () => {
   const [loading, setLoading] = useState(true);
   const [contacts, setContacts] = useState<IContacts[]>([]);
   const [selectedUser, setSelectedUser] = useState<string>("");
+  const [isSignatureAdded, setIsSignatureAdded] = useState<boolean>(false);
   const currentUser = localStorage.getItem("user_id");
 
   const signatureRef = useRef<SignatureCanvas | null>(null);
@@ -63,12 +65,40 @@ const Editor = () => {
 
   const clearSignature = () => {
     signatureRef.current?.clear();
+    setIsSignatureAdded(false);
   };
 
-  const signDocument = () => {
-    // Logic to add the selected user as a signer
-    if (selectedUser) {
-      console.log(`Adding signer: ${selectedUser}`);
+  const handleSignatureEnd = () => {
+    if (signatureRef.current && !signatureRef.current.isEmpty()) {
+      setIsSignatureAdded(true);
+    }
+  };
+
+  const signDocument = async () => {
+    if (!signatureRef.current || signatureRef.current.isEmpty()) {
+      alert("Please add a signature.");
+      return;
+    }
+
+    if (document && document?.user_document.length < 3 && !selectedUser) {
+      alert("Please select the next user.");
+      return;
+    }
+
+    const dataUrl = signatureRef.current.toDataURL("image/png");
+    const blob = await (await fetch(dataUrl)).blob();
+    const file = new File([blob], "signature.png", { type: "image/png" });
+
+    try {
+      const response = await uploadSignature(file, id!, selectedUser);
+      if (response.status === 1) {
+        navigate("/");
+        // Handle success (e.g., navigate to another page or show a success message)
+      } else {
+        console.error("Error uploading signature:", response.message);
+      }
+    } catch (error) {
+      console.error("Failed to upload signature:", error);
     }
   };
 
@@ -83,7 +113,10 @@ const Editor = () => {
     <div className="flex flex-col items-center p-6 space-y-6">
       <div className="flex space-x-6">
         {/* PDF Viewer */}
-        <div className="relative w-[700px] h-[80vh] border-4 border-gray-300 rounded-lg bg-white p-2" ref={pdfContainerRef}>
+        <div
+          className="relative w-[700px] h-[80vh] border-4 border-gray-300 rounded-lg bg-white p-2"
+          ref={pdfContainerRef}
+        >
           {loading ? (
             <div className="flex items-center space-x-2 text-gray-600 justify-center h-full">
               <Loader2 className="animate-spin w-6 h-6" />
@@ -103,6 +136,7 @@ const Editor = () => {
           <SignatureCanvas
             ref={signatureRef}
             penColor="black"
+            onEnd={handleSignatureEnd}
             canvasProps={{
               width: 250,
               height: 100,
@@ -180,10 +214,18 @@ const Editor = () => {
 
           <div className="mt-auto w-full">
             <button
-              disabled={contacts.length === 0}
+              disabled={
+                !isSignatureAdded ||
+                (document &&
+                  document?.user_document.length < 3 &&
+                  !selectedUser)
+              }
               onClick={signDocument}
               className={`w-full px-4 py-2 rounded ${
-                contacts.length === 0
+                !isSignatureAdded ||
+                (document &&
+                  document?.user_document.length < 3 &&
+                  !selectedUser)
                   ? "bg-gray-400 text-gray-700 cursor-not-allowed"
                   : "bg-blue-500 text-white"
               }`}

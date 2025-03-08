@@ -27,7 +27,6 @@ export default function FileUpload() {
       const result = await uploadFile(file, "pdf", fileName.trim());
 
       if (result?.status) {
-        toast.success("File uploaded successfully!");
         setFile(null);
         setFileName("");
         navigate(`/editor/${result?.data?.id}`);
@@ -35,7 +34,6 @@ export default function FileUpload() {
         throw new Error("Upload failed");
       }
     } catch (error) {
-      toast.error("Failed to upload file. Please try again.");
       console.error(error);
     } finally {
       setUploading(false);
