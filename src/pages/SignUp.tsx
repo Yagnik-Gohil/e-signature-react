@@ -56,6 +56,7 @@ const SignUp = () => {
     if (response.status) {
       const data = response.data;
       localStorage.setItem("token", data.jwt);
+      localStorage.setItem("user_id", data.user.id);
       navigate("/");
     }
   }

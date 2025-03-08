@@ -115,13 +115,13 @@ const DocumentList = () => {
                         : "bg-gray-100 text-gray-700"
                     }`}
                   >
-                    {item.status}
+                    {item.status.replace('_', ' ')}
                   </span>
                 </TableCell>
 
                 {/* Owner Name */}
                 <TableCell className="px-4 py-3 capitalize font-medium">
-                  {item.user_documents.find(
+                  {item.user_document.find(
                     (user) => user.type === UserDocumentType.OWNER
                   )?.user.name || "N/A"}
                 </TableCell>
@@ -133,7 +133,7 @@ const DocumentList = () => {
                       View Signers
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-80 p-3 bg-white shadow-lg rounded-lg border">
-                      {item.user_documents.map((data, index) => (
+                      {item.user_document.map((data, index) => (
                         <DropdownMenuItem
                           key={index}
                           className="flex flex-col items-start p-4 border-b last:border-0 hover:bg-gray-50 transition"
@@ -145,6 +145,11 @@ const DocumentList = () => {
                               <span className="ml-2 px-2 py-0.5 text-xs font-medium rounded-full bg-gray-200 text-gray-700">
                                 {data.type}
                               </span>
+                              {currentUser === data.user.id && (
+                                <span className="ml-2 px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-700">
+                                  Me
+                                </span>
+                              )}
                             </span>
                             <span className="text-sm text-gray-500">
                               {data.user.email}
@@ -184,14 +189,14 @@ const DocumentList = () => {
                   <Button
                     disabled={
                       currentUser !=
-                      item.user_documents.find(
-                        (user) => user.type === UserDocumentType.OWNER
+                      item.user_document.find(
+                        (user) => user.status === SignatureStatus.PENDING
                       )?.user.id
                     }
                     onClick={() => navigate(`editor/${item.id}`)}
                     variant="outline"
                   >
-                    <Edit></Edit> Edit
+                    <Edit></Edit> Sign
                   </Button>
                 </TableCell>
               </TableRow>

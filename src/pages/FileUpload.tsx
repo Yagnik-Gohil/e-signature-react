@@ -30,7 +30,7 @@ export default function FileUpload() {
         toast.success("File uploaded successfully!");
         setFile(null);
         setFileName("");
-        navigate(`editor/${result?.data?.id}`);
+        navigate(`/editor/${result?.data?.id}`);
       } else {
         throw new Error("Upload failed");
       }

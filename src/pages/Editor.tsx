@@ -1,19 +1,19 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { getDocumentById } from "@/api/document.service";
 import SignatureCanvas from "react-signature-canvas";
 import { Loader2 } from "lucide-react";
-import { IDocuments } from "@/types";
-
-const A4_WIDTH = 595; // A4 standard width in points
-const A4_HEIGHT = 842; // A4 standard height in points
+import { IDocuments, IContacts } from "@/types";
+import { getContacts } from "@/api/contact.service";
 
 const Editor = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [document, setDocument] = useState<IDocuments>();
   const [loading, setLoading] = useState(true);
-  const [selectedUser, setSelectedUser] = useState<string | null>(null);
-  const [pdfSize, setPdfSize] = useState({ width: 0, height: 0 });
+  const [contacts, setContacts] = useState<IContacts[]>([]);
+  const [selectedUser, setSelectedUser] = useState<string>("");
+  const currentUser = localStorage.getItem("user_id");
 
   const signatureRef = useRef<SignatureCanvas | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -40,68 +40,48 @@ const Editor = () => {
     fetchDocument();
   }, [id]);
 
-  const pdfUrl = document
-    ? `${document.base_url}${document.root}${document.folder}${document.name}`
-    : "";
-
   useEffect(() => {
-    const updatePdfSize = () => {
-      if (iframeRef.current) {
-        const rect = iframeRef.current.getBoundingClientRect();
-        setPdfSize({ width: rect.width, height: rect.height });
+    const fetchContacts = async () => {
+      try {
+        const response = await getContacts();
+        if (response.status === 1) {
+          setContacts(response.data);
+        } else {
+          console.error("Error fetching contacts:", response.message);
+        }
+      } catch (error) {
+        console.error("Failed to fetch contacts:", error);
       }
     };
 
-    setTimeout(updatePdfSize, 1000);
-    window.addEventListener("resize", updatePdfSize);
-    return () => window.removeEventListener("resize", updatePdfSize);
+    fetchContacts();
   }, []);
+
+  const pdfUrl = document
+    ? `${document.base_url}${document.root}${document.folder}${document.name}`
+    : "";
 
   const clearSignature = () => {
     signatureRef.current?.clear();
   };
 
-  const placeSignature = () => {
-    if (!document || !selectedUser) return;
-    
-    const userDoc = document.user_document.find(user => user.user.id === selectedUser);
-    if (!userDoc || !signatureRef.current) return;
+  const signDocument = () => {
+    // Logic to add the selected user as a signer
+    if (selectedUser) {
+      console.log(`Adding signer: ${selectedUser}`);
+    }
+  };
 
-    const signatureData = signatureRef.current.toDataURL("image/png");
-
-    const img = new Image();
-    img.src = signatureData;
-    img.onload = () => {
-      const scaleX = pdfSize.width / A4_WIDTH;
-      const scaleY = pdfSize.height / A4_HEIGHT;
-
-      const xPos = userDoc.signature_box.x * scaleX;
-      const yPos = userDoc.signature_box.y * scaleY;
-      const width = userDoc.signature_box.width * scaleX;
-      const height = userDoc.signature_box.height * scaleY;
-
-      const imgElement = window.document.createElement("img");
-
-      imgElement.src = signatureData;
-      imgElement.style.position = "absolute";
-      imgElement.style.left = `${xPos}px`;
-      imgElement.style.top = `${yPos}px`;
-      imgElement.style.width = `${width}px`;
-      imgElement.style.height = `${height}px`;
-      imgElement.style.pointerEvents = "none";
-
-      pdfContainerRef.current?.appendChild(imgElement);
-    };
+  const getNextRoleLabel = () => {
+    const userCount = document?.user_document.length || 0;
+    if (userCount === 1) return "Add Role 2 Signer";
+    if (userCount === 2) return "Add Role 3 Signer";
+    return "";
   };
 
   return (
-    <div className="flex flex-col items-center p-6">
-      <h1 className="text-lg font-semibold flex items-center space-x-3">
-        <Loader2 className="w-6 h-6 text-gray-600" />
-        <span>PDF Signature</span>
-      </h1>
-
-      <div className="flex mt-5 space-x-6">
+    <div className="flex flex-col items-center p-6 space-y-6">
+      <div className="flex space-x-6">
         {/* PDF Viewer */}
         <div className="relative w-[700px] h-[80vh] border-4 border-gray-300 rounded-lg bg-white p-2" ref={pdfContainerRef}>
           {loading ? (
@@ -117,9 +97,9 @@ const Editor = () => {
         </div>
 
         {/* Signature Input Panel */}
-        <div className="w-[300px] flex flex-col items-center bg-gray-100 p-4 rounded-lg shadow">
-          <h2 className="text-md font-semibold mb-2">Draw Your Signature</h2>
-          
+        <div className="w-[400px] flex flex-col items-center bg-gray-100 p-6 rounded-lg shadow space-y-4 relative">
+          <h2 className="text-lg font-semibold">Signature Panel</h2>
+
           <SignatureCanvas
             ref={signatureRef}
             penColor="black"
@@ -130,32 +110,87 @@ const Editor = () => {
             }}
           />
 
-          <div className="flex space-x-2 mt-2">
-            <button onClick={clearSignature} className="bg-red-500 text-white px-3 py-1 rounded">
+          <div className="flex space-x-2">
+            <button
+              onClick={clearSignature}
+              className="bg-red-500 text-white px-4 py-2 rounded"
+            >
               Clear
             </button>
           </div>
 
-          <h3 className="text-sm font-semibold mt-4">Select User</h3>
-          <select
-            className="w-full border p-2 rounded mt-2"
-            value={selectedUser || ""}
-            onChange={(e) => setSelectedUser(e.target.value)}
-          >
-            <option value="">-- Select a User --</option>
+          <h3 className="text-md font-semibold">User List</h3>
+          <ul className="w-full border p-2 rounded bg-white shadow">
             {document?.user_document.map((userDoc) => (
-              <option key={userDoc.user.id} value={userDoc.user.id}>
-                {userDoc.user.name} ({userDoc.role})
-              </option>
+              <li
+                key={userDoc.user.id}
+                className="flex justify-between items-center p-2 border-b last:border-b-0"
+              >
+                <div className="flex flex-col">
+                  <span className="font-semibold">
+                    {userDoc.user.name}
+                    {currentUser === userDoc.user.id && (
+                      <span className="ml-2 px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-700">
+                        Me
+                      </span>
+                    )}
+                  </span>
+                  <span className="text-sm text-gray-600">{userDoc.role}</span>
+                </div>
+                <span className="text-sm text-gray-600">
+                  {userDoc.user.email}
+                </span>
+              </li>
             ))}
-          </select>
+          </ul>
 
-          <button
-            onClick={placeSignature}
-            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-          >
-            Sign
-          </button>
+          {document && document?.user_document.length < 3 && (
+            <div className="w-full mt-4">
+              <label className="block text-sm font-medium text-gray-700">
+                {getNextRoleLabel()}
+              </label>
+              {contacts.length === 0 ? (
+                <div className="text-center mt-2">
+                  <p className="text-red-500 text-sm">
+                    No contacts found. Please add contacts first.
+                  </p>
+                  <button
+                    onClick={() => navigate("/contact")}
+                    className="mt-2 bg-blue-500 text-white px-4 py-2 rounded"
+                  >
+                    Go to Contacts
+                  </button>
+                </div>
+              ) : (
+                <select
+                  className="w-full border p-2 rounded mt-2"
+                  value={selectedUser}
+                  onChange={(e) => setSelectedUser(e.target.value)}
+                >
+                  <option value="">-- Select a User --</option>
+                  {contacts.map((contact) => (
+                    <option key={contact.id} value={contact.recipient.id}>
+                      {contact.recipient_name} ({contact.recipient.email})
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+          )}
+
+          <div className="mt-auto w-full">
+            <button
+              disabled={contacts.length === 0}
+              onClick={signDocument}
+              className={`w-full px-4 py-2 rounded ${
+                contacts.length === 0
+                  ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                  : "bg-blue-500 text-white"
+              }`}
+            >
+              Sign
+            </button>
+          </div>
         </div>
       </div>
     </div>
